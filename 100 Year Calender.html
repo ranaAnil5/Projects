@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calender</title>
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous">          
+    </script>
+    <style>
+        body {
+            background-color: rgba(140,166,166,0.8);
+            color: white;
+        }
+        #container {
+            width: 40%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 50px;
+        }
+        #table1 {
+            background-color: green;
+            padding: 20px;
+            border: solid 2px black;
+            border-radius: 10px;
+            width: 100%;
+        }
+        th {
+            padding-bottom: 20px;
+            color: aquamarine;
+            border-bottom: solid  1px !important;
+        }
+        td {
+            border: solid 2px transparent;
+            border-radius: 20px;
+            width: 60px;
+            height: 60px;
+            text-align: center;
+        }
+        #dateToday{
+            color: teal;
+            text-decoration: underline ; 
+            margin-left:3px;
+            margin-bottom: 10px;
+        }
+        .dateToday {
+            border: solid 2px aquamarine; 
+            background-color: rgb(169,169,169,0.7);
+        }
+        .holiday{
+            color: rgb(139,0,0) !important;
+            font-size:20px
+        }
+        .hiddenTd{
+            display: hidden;
+            background-color: inherit !important;
+            border:none !important;
+            pointer-events: none;
+        }
+        .selected {
+            border: solid 2px white;
+            background-color: darkgray;
+            opacity: 0.9; 
+        }
+        .selected :hover{
+            border: solid 2px white;
+            background-color: darkgray;
+        }
+        .selectedSide {
+            border-bottom: solid 1px white;
+            border-top: solid 1px white;
+        }
+        .left {
+            border-right: solid 2px white;
+            
+        }
+        .right {
+            border-left: solid 2px white;
+            
+        }
+        .selectedTB {
+            border-left: solid 1px white;
+            border-right: solid 1px white;
+        }
+        .bottom {
+            border-top: solid 2px white;
+        }
+        .top {
+            border-bottom: solid 2px white;
+        }
+        .currentOption{
+            background-color: #B0C4DE;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">   
+        <div id="dateSelection">
+            <label>Year</label>
+            <select id="selectYear">
+            </select>
+            <label>Month</label>
+            <select id="selectMonth">
+            </select>
+        </div>
+        <h1 id='dateToday'></h1>
+        <table id="table1">
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thr</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr></tr>
+                <tr></tr>
+                <tr></tr>
+                <tr></tr>
+                <tr></tr>
+            </tbody>
+        </table>
+        <div>
+</body>
+<script>
+    $(document).ready(function () {
+        var currentDate = new Date().getDate(); 
+        var currentMonth = new Date().getMonth();
+        var currentYear = new Date().getFullYear(); 
+        var months = ["January", "February", "March", "April","May", "June", "July", 
+                        "August","September", "October", "November", "December"];
+        var date =new Date();
+        var dateMonth = currentMonth;
+        var dateYear = currentYear;
+        var y = dateYear, m =dateMonth; 
+        var firstDay = new Date(y, m, 1);  
+        var lastDay = new Date(y, m + 1, 0);
+        var days;
+        table=()=>{
+            days=1;
+            for (var j = 1; j < 8; j++) {           
+                var a = $('table tbody tr')[0];
+                if($(a).children("td").length>=firstDay.getDay()){
+                    $('<td/>').html(days).appendTo(a);
+                    days++;
+                }else{
+                    $('<td/>').appendTo(a).addClass("hiddenTd");
+                }
+            } 
+            for (var i = 1; i<=5; i++) {
+                for (var j = 1; j < 8; j++) {
+                    if(days>lastDay.getDate()){         
+                        break;
+                    }
+                    var a = $('table tbody tr')[i];
+                    $('<td/>').html(days).appendTo(a);  
+                    days++;
+                }
+            }
+            $('tbody td').each(function () {            
+                if ($(this).text() == currentDate && currentMonth==dateMonth && currentYear==dateYear) {
+                    $(this).addClass('dateToday');
+                }
+            });
+            $("tbody tr td:nth-child(7)").addClass("holiday");     
+        }
+        $(" <option />").html(currentYear).appendTo($('#selectYear'))   
+            .addClass("currentOption");   
+        $(" <option />").html(months[currentMonth]).appendTo($('#selectMonth'))
+            .addClass("currentOption");
+        options=()=>{
+            for(let i=new Date(1970).getFullYear();i<=2070;i++){
+                var a = $('#selectYear');
+                $(" <option/>").html(i).appendTo(a);
+            }
+            for(let i=0;i<=11;i++){
+                var a = $('#selectMonth');
+                $(" <option/>").html(months[i]).appendTo(a);
+            }
+        }
+        document.getElementById('dateToday').innerHTML = months[dateMonth]  + " - " + dateYear;
+        table();
+        options();
+        $("#dateSelection").change(function(){                 
+            dateMonth = months.indexOf($("#selectMonth").val());
+            dateYear = parseInt($("#selectYear").val());
+            y=dateYear;
+            m=dateMonth;
+            firstDay = new Date(y, m, 1);  
+            lastDay = new Date(y, m + 1, 0);
+            document.getElementById('dateToday').innerHTML = months[dateMonth]  + " - " + dateYear;
+            $("td").remove();
+            table();
+        });
+        $('tbody').on("mouseover","td",
+            function () {
+                var a = $(this).parent().children('td').index(this);
+                $(this).addClass("selected");
+                $(this).prev().addClass("selectedSide left");
+                $(this).next().addClass("selectedSide right");
+                $(this).parent().prev().children('td:nth-child(' + (a + 1) + ')').addClass("selectedTB top");
+                $(this).parent().next().children('td:nth-child(' + (a + 1) + ')').addClass("selectedTB bottom");
+            });
+         $('tbody').on("mouseout","td",  
+            function () {                
+                $(this).removeClass("selected");
+                $(this).prev().removeClass("selectedSide left");
+                $(this).next().removeClass("selectedSide right");
+                $(this).parent().prev().children('td').removeClass("selectedTB top");
+                $(this).parent().next().children('td').removeClass("selectedTB bottom");
+            });
+    });
+</script>
+</html>
